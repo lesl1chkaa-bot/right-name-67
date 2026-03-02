@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>67 Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent-blue: #00eaff;
+            --accent-pink: #ff007b;
+            --main-font: 'Inter', sans-serif;
+            --mono-font: 'Roboto Mono', monospace;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #050505;
+            font-family: var(--main-font); color: white;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        #bg-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+        }
+
+        .ui-container {
+            position: relative; z-index: 10; text-align: center; width: 100%;
+        }
+
+        #nameInput {
+            pointer-events: auto;
+            background: transparent; border: none;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+            font-family: var(--main-font); font-size: 4rem;
+            font-weight: 900; color: white;
+            text-align: center; outline: none; width: 60%;
+            text-transform: uppercase; letter-spacing: 5px;
+            transition: all 0.4s ease;
+        }
+
+        #nameInput.hide { transform: scale(0.5); opacity: 0; }
+
+        #result {
+            display: none; flex-direction: column; align-items: center;
+        }
+
+        .name-output {
+            font-size: 7rem; font-weight: 900; letter-spacing: -2px;
+            text-transform: uppercase; margin: 0;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .love-text {
+            font-family: var(--mono-font); font-size: 2rem;
+            letter-spacing: 10px; text-transform: uppercase;
+            margin-top: 10px; color: white;
+        }
+
+        .num-67-main {
+            color: var(--accent-blue); font-size: 3.5rem;
+            text-shadow: 0 0 25px var(--accent-blue);
+            font-weight: 900;
+        }
+
+        /* Стиль для летящих 67 */
+        .particle {
+            position: absolute; font-family: var(--mono-font);
+            font-weight: 700; pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; }
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(110vh); opacity: 0; }
+            20% { opacity: var(--op); }
+            80% { opacity: var(--op); }
+            to { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-layer"></div>
+
+    <div class="ui-container">
+        <input type="text" id="nameInput" placeholder="ENTER NAME" maxlength="15" autofocus>
+        
+        <div id="result">
+            <h1 id="displayName" class="name-output"></h1>
+            <div class="love-text">LOVES <span class="num-67-main">67</span></div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('nameInput');
+        const result = document.getElementById('result');
+        const displayName = document.getElementById('displayName');
+        const bgLayer = document.getElementById('bg-layer');
+        let isExploded = false;
+
+        // Фоновый поток 67
+        function spawnBg() {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.innerText = '67';
+            p.style.left = Math.random() * 100 + 'vw';
+            
+            // Если взрыв произошел, делаем числа ярче и больше
+            if (isExploded) {
+                p.style.fontSize = (Math.random() * 3 + 1) + 'rem';
+                p.style.color = Math.random() > 0.5 ? 'var(--accent-blue)' : 'var(--accent-pink)';
+                p.style.setProperty('--op', Math.random() * 0.7 + 0.3);
+            } else {
+                p.style.fontSize = (Math.random() * 1.5 + 0.5) + 'rem';
+                p.style.color = 'rgba(255,255,255,0.2)';
+                p.style.setProperty('--op', '0.1');
+            }
+            
+            p.style.animation = `floatUp ${Math.random() * 3 + 3}s linear forwards`;
+            bgLayer.appendChild(p);
+            setTimeout(() => p.remove(), 6000);
+        }
+
+        // Изначальный медленный фон
+        let bgInterval = setInterval(spawnBg, 200);
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                isExploded = true;
+                const name = input.value;
+                input.classList.add('hide');
+                
+                setTimeout(() => {
+                    input.style.display = 'none';
+                    
+                    // МАССИВНЫЙ ВЗРЫВ
+                    for(let i=0; i<250; i++) {
+                        createExplosion();
+                    }
+
+                    displayName.innerText = name;
+                    result.style.display = 'flex';
+                    
+                    // Ускоряем фоновое появление 67 в 5 раз
+                    clearInterval(bgInterval);
+                    bgInterval = setInterval(spawnBg, 40); 
+                }, 400);
+            }
+        });
+
+        function createExplosion() {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.innerText = '67';
+            
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * 1200 + 100;
+            const tx = Math.cos(angle) * dist;
+            const ty = Math.sin(angle) * dist;
+
+            p.style.left = '50%';
+            p.style.top = '50%';
+            p.style.fontSize = Math.random() * 5 + 1 + 'rem';
+            p.style.color = Math.random() > 0.5 ? 'var(--accent-blue)' : 'white';
+            p.style.textShadow = `0 0 20px ${p.style.color}`;
+            p.style.setProperty('--tx', tx + 'px');
+            p.style.setProperty('--ty', ty + 'px');
+            p.style.setProperty('--tr', Math.random() * 720 + 'deg');
+            p.style.animation = 'explode 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards';
+            
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 2000);
+        }
+    </script>
+</body>
+</html>
